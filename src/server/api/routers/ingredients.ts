@@ -17,6 +17,15 @@ export const ingredientRouter = createTRPCRouter({
       });
     }),
 
+    //Get all ingredients
+    getAllIngredients: protectedProcedure
+    .query(async ({ctx})=>{
+      return ctx.db.ingredient.findMany({
+        
+      });
+    }),
+
+
   // Get an ingredient by ID
   getIngredientById: publicProcedure
     .input(z.object({ id: z.number() }))

@@ -1,8 +1,6 @@
 
 // import { useRouter } from "next/router";
-import { useState } from "react";
 // import {trpc} from '../api/trpc/[trpc]'
-import { api } from "~/trpc/react";
 import Link from "next/link";
 import { getServerAuthSession } from "~/server/auth";
 
@@ -11,7 +9,7 @@ export const SigninComponent = async () => {
 
 
     return(
-        <div className="flex flex-col items-center justify-center gap-4">
+        <div className="flex flex-col items-start justify-center gap-4 m-10">
         <p className="text-center text-base text-white">
           {session && <span>Logged in as {session.user?.name}</span>}
         </p>
