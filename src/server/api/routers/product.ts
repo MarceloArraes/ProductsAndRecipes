@@ -11,6 +11,10 @@ export const productRouter = createTRPCRouter({
         include: { ingredients: true },
       });
     }),
+  getAllProducts: publicProcedure
+    .query(async ({ ctx }) => {
+      return ctx.db.product.findMany()
+    }),
 
   // Create a new product
   createProduct: protectedProcedure

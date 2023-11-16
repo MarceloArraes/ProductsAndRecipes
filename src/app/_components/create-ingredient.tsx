@@ -29,14 +29,14 @@ export function CreateIngredient() {
     >
       <input
         type="text"
-        placeholder="Ingredient Name"
+        placeholder="Ingrediente"
         value={name}
         onChange={(e) => setName(e.target.value)}
         className="w-full rounded-full px-4 py-2 text-black"
       />
       <input
         type="number"
-        placeholder="Cost per Kg"
+        placeholder="Custo por Kg"
         value={costPerKg}
         onChange={(e) => setCostPerKg(e.target.value)}
         className="w-full rounded-full px-4 py-2 text-black"
@@ -46,7 +46,7 @@ export function CreateIngredient() {
         className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
         disabled={createIngredient.isLoading}
       >
-        {createIngredient.isLoading ? "Submitting..." : "Submit"}
+        {createIngredient.isLoading ? "Submitting..." : "Salvar"}
       </button>
     </form>
   );
