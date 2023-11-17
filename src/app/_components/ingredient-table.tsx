@@ -22,7 +22,7 @@ const IngredientTable = () => {
     } 
     
     return (
-<table className="min-w-full table-auto border-collapse bg-white shadow-md text-black m-10" >
+<table className="max-w-lg table-auto border-collapse bg-white shadow-md text-black m-10" >
     <thead className="bg-gray-200">
         <tr >
             <th className="px-4 py-2 border">Ingrediente</th>
