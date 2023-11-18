@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import { api } from "~/trpc/server";
+
 
 export const productRouter = createTRPCRouter({
   // Fetch a single product by ID
@@ -17,20 +19,41 @@ export const productRouter = createTRPCRouter({
     }),
 
   // Create a new product
+  // Here will evaluate if > 500kg and make the calculations to get the cost per kg
   createProduct: protectedProcedure
   .input(z.object({ 
     name: z.string().min(1),
     sellPricePerKg: z.number(),
     ingredients: z.array(z.object({
       ingredientId: z.number(),
-      quantity: z.number(),
+      quantity: z.number()
     })),
   }))
   .mutation(async ({ ctx, input }) => {
+    const ingredientsWeight = input.ingredients.reduce((total, ingredient) => total + ingredient.quantity, 0);
+
+    const ingredientCosts = await Promise.all(input.ingredients.map(async (ingredient) => {
+      const ingredientData = await api.ingredient.getIngredientById.query({ id: ingredient.ingredientId });
+
+      if (!ingredientData) {
+        throw new Error(`Ingredient with ID ${ingredient.ingredientId} not found`);
+      }
+
+      return ingredientData.costPerKg * ingredient.quantity;
+    }));
+
+      // Sum up all ingredient costs
+    const totalIngredientCost = ingredientCosts.reduce((total, cost) => total + cost, 0);
+
+    // Calculate cost per kg
+    const costPerKg = totalIngredientCost / ingredientsWeight as unknown as number;
+
+
     return ctx.db.product.create({
       data: {
         name: input.name,
         sellPricePerKg: input.sellPricePerKg,
+        costPerKg: costPerKg,
         ingredients: {
           create: input.ingredients.map(ing => ({
             quantity: ing.quantity,
@@ -59,6 +82,8 @@ export const productRouter = createTRPCRouter({
         },
       });
     }),
+
+    
 
   // Delete a product
   deleteProduct: protectedProcedure

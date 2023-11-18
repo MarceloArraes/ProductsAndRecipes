@@ -19,6 +19,8 @@ model Product {
   name           String
   sellPricePerKg Float
   costPerKg Float @default(0.00)
+  batchSize Int @default(500)
+  isArchived Boolean @default(false)
   ingredients    ProductIngredient[]
 }
 

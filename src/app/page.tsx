@@ -24,9 +24,9 @@ export default function Home() {
       >
         Criar Racoes
       </Link>
-      <div className="flex flex-row max-w-lg justify-around mx-5">
-        <IngredientTable />
+      <div className="flex flex-row min-w-fit justify-around mx-5">
         <ProductTable />
+        <IngredientTable />
       </div>
     </main>
   );
