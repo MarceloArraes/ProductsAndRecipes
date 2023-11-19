@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/
 import { api } from "~/trpc/server";
 
 
+
 export const productRouter = createTRPCRouter({
   // Fetch a single product by ID
   getProductById: publicProcedure
@@ -15,7 +16,11 @@ export const productRouter = createTRPCRouter({
     }),
   getAllProducts: publicProcedure
     .query(async ({ ctx }) => {
-      return ctx.db.product.findMany()
+      return ctx.db.product.findMany({
+        orderBy:{
+          name:'desc'
+        }
+      })
     }),
 
   // Create a new product
@@ -65,25 +70,68 @@ export const productRouter = createTRPCRouter({
       },
     });
   }),
+  
 
-  // Update an existing product
-  updateProduct: protectedProcedure
-    .input(z.object({
-      id: z.number(),
-      name: z.string().min(1).optional(),
-      sellPricePerKg: z.number().optional(),
-    }))
-    .mutation(async ({ ctx, input }) => {
-      return ctx.db.product.update({
-        where: { id: input.id },
-        data: {
-          name: input.name,
-          sellPricePerKg: input.sellPricePerKg,
-        },
-      });
-    }),
+// Update an existing product
+updateProduct: protectedProcedure
+  .input(z.object({
+    id: z.number(),
+    name: z.string().min(1).optional(),
+    sellPricePerKg: z.number().optional(),
+    ingredients: z.array(z.object({
+      ingredientId: z.number(),
+      quantity: z.number()
+    })).optional(),
+  }))
+  .mutation(async ({ ctx, input }) => {
+    let costPerKg =0;
 
-    
+    if (input.ingredients) {
+      const ingredientsWeight = input.ingredients.reduce((total, ingredient) => total + ingredient.quantity, 0);
+
+      const ingredientCosts = await Promise.all(input.ingredients.map(async (ingredient) => {
+        const ingredientData = await api.ingredient.getIngredientById.query({ id: ingredient.ingredientId });
+
+        if (!ingredientData) {
+          throw new Error(`Ingredient with ID ${ingredient.ingredientId} not found`);
+        }
+
+        return ingredientData.costPerKg * ingredient.quantity;
+      }));
+
+      // Sum up all ingredient costs
+      const totalIngredientCost = ingredientCosts.reduce((total, cost) => total + cost, 0);
+
+      // Calculate cost per kg
+      costPerKg = totalIngredientCost / ingredientsWeight;
+    }
+
+    await ctx.db.productIngredient.deleteMany({
+      where: {
+        productId: input.id
+      }
+    });
+
+    return ctx.db.product.update({
+      where: { id: input.id },
+      data: {
+        name: input.name,
+        sellPricePerKg: input.sellPricePerKg,
+        costPerKg: costPerKg,
+        ...(input.ingredients && {
+          
+          ingredients: {
+            create: input.ingredients.map(ing => ({
+              quantity: ing.quantity,
+              ingredient: {
+                connect: { id: ing.ingredientId },
+              },
+            })),
+          },
+        }),
+      },
+    });
+  }),
 
   // Delete a product
   deleteProduct: protectedProcedure

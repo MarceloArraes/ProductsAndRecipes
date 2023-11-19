@@ -78,7 +78,7 @@ export function CreateProduct() {
         className="w-full rounded-full px-4 py-2 text-black"
       />
 
-{listOfIngredients.data?.map((ingredient) => (
+      {listOfIngredients.data?.map((ingredient) => (
         <div key={ingredient.id} className="flex items-center gap-2">
           <input
             type="checkbox"

@@ -1,45 +1,54 @@
 "use client";
 
-import { Product } from "@prisma/client";
+import type { Product, ProductIngredient } from "@prisma/client";
 // import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import type { ChangeEvent } from "react";
 // import {trpc} from '../api/trpc/[trpc]'
 import { api } from "~/trpc/react";
 import { SelectIngredients } from "./select-ingredients";
 
+interface ExtendedProduct extends Product {
+  ingredients: ProductIngredient[];
+}
+
 export function EditProduct({productId}:{productId: string}) {
-  const [localProduct, setLocalProduct] = useState<Product | null>();
+  const [localProduct, setLocalProduct] = useState<ExtendedProduct | undefined>();
     const numberId = parseInt(productId);
-    console.log('numberId ', numberId);
     const {data, isLoading} = api.product.getProductById.useQuery({id:numberId})
+
     const productMutation = api.product.updateProduct.useMutation()
 
     useEffect(() => {
-      setLocalProduct(data)
+      if (data !== null) {
+        setLocalProduct(data);
+      }
     }, [data])
     
-    console.log('data EDITPRODUCT ', data);
-    // const handleProductEdit = (productId) => {
 
-    //   productMutation.mutate({id: productId})
-    // }
+    const handleLocalProductChange = ((e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      const inputName = e.target.name
+      setLocalProduct(prevState => {
+        if (!prevState) return prevState;
+          return {
+              ...prevState,
+              [e.target.name]: inputName==='sellPricePerKg'? parseInt(value) : value
+          };
+      });
+  })
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-//   const createIngredient = api.ingredient.createIngredient.useMutation({
-//     onSuccess: () => {
-//       // router.reload();  // Note: 'reload' is used instead of 'refresh' in newer Next.js versions
-//       setName("");
-//       setCostPerKg("");
-//     },
-//   });
-  console.log('data251213 ', localProduct, productId);
+
+
+
   if(isLoading) return null
   return (
     <form
-    //   onSubmit={(e) => {
-    //     e.preventDefault();
-    //     createIngredient.mutate({ name, costPerKg: parseFloat(costPerKg) });
-    //   }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        console.log('localProduct ', localProduct);
+        if(localProduct) productMutation.mutate(localProduct);
+      }}
       className="flex flex-col gap-2 w-full"
     >
         <div className="flex flex-col justify-around">
@@ -47,29 +56,34 @@ export function EditProduct({productId}:{productId: string}) {
         <div className="justify-center items-center">
           <input
               type="text"
-              placeholder={data?.name}
-              value={data?.name}
-              onChange={(e) => console.log('asd')}
+              placeholder={localProduct?.name}
+              value={localProduct?.name ??''}
+              name="name"
+              onChange={handleLocalProductChange}
               className="w-full rounded-full px-4 py-2 text-black"
           />
           <input
               type="text"
-              placeholder={data?.sellPricePerKg?.toString()}
-              value={data?.sellPricePerKg}
-              onChange={(e) => console.log('asd')
-              }
+              name="sellPricePerKg"
+              placeholder={localProduct?.sellPricePerKg?.toString()}
+              value={localProduct?.sellPricePerKg??''}
+              onChange={handleLocalProductChange}
               className="w-full rounded-full px-4 py-2 text-black"
           />
+        
+      </div>
+          <SelectIngredients 
+            listOfIngredientsOnProduct={localProduct?.ingredients}
+            setLocalProduct={setLocalProduct}
+        />
         <button
           type="submit"
           className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
           disabled={isLoading}
         >
-          {/* {createIngredient.isLoading ? "Submitting..." : "Salvar"} */}Salvar
+          {isLoading ? "Submitting..." : "Salvar"}
         </button>
-        
-      </div>
-      <SelectIngredients />
+      
       </div>
     </form>
   );

@@ -1,58 +1,80 @@
 "use client"
 
-import { useState } from "react";
+import type { Product, ProductIngredient } from "@prisma/client";
+import type {ChangeEvent, Dispatch, SetStateAction} from "react";
 import { api } from "~/trpc/react";
 
-type IngredientQuantities = Record<string, string>;
 
-export const SelectIngredients = () => {
-  const [selectedIngredients, setSelectedIngredients] = useState(new Set<number>())
-  const [ingredientQuantities, setIngredientQuantities] = useState<IngredientQuantities>({});
+interface SelectIngredientsProps2 {
+  listOfIngredientsOnProduct: ProductIngredient[] | undefined;
+  setLocalProduct: Dispatch<SetStateAction<ExtendedProduct | undefined>>;
+}
 
-  const listOfIngredients = api.ingredient.getAllIngredients.useQuery();
+interface ExtendedProduct extends Product {
+  ingredients: ProductIngredient[];
+}
 
-  const handleIngredientSelection = (ingredientId: number, isSelected: boolean) => {
-    setSelectedIngredients(prev => {
-      const newSet = new Set(prev);
-      if (isSelected) newSet.add(ingredientId);
-      else newSet.delete(ingredientId);
-      return newSet;
+export const SelectIngredients = ({listOfIngredientsOnProduct, setLocalProduct}:SelectIngredientsProps2) => {
+  const {data} = api.ingredient.getAllIngredients.useQuery();
+  
+  const handleIngredientsInProduct = (e: ChangeEvent<HTMLInputElement>) => {
+    const ingredientId = parseInt(e.target.dataset.ingredientid??'');
+    if (isNaN(ingredientId)) return;
+    const isCheckbox = e.target.type === 'checkbox';
+
+    setLocalProduct(prevState => {
+        // If prevState is null, return null
+        console.log('prevState ', prevState);
+        if (!prevState) return undefined;
+
+        // Handle checkbox change
+        if (isCheckbox) {
+          const ingredientExists = prevState.ingredients.some(ingredient => ingredient.ingredientId === ingredientId);
+
+
+            return {
+                ...prevState,
+                ingredients: ingredientExists
+                    ? prevState.ingredients.filter(ingredient => ingredient.ingredientId !== ingredientId)
+                    : [...prevState.ingredients, { ingredientId, quantity: 0, productId: prevState.id }]
+            };
+        }
+
+        // Handle quantity change for existing ingredient
+        const quantity = parseInt(e.target.value, 10) || 0;
+        return {
+            ...prevState,
+            ingredients: prevState.ingredients.map(ingredient =>
+                ingredient.ingredientId === ingredientId ? { ...ingredient, quantity } : ingredient
+            )
+        };
     });
-    if (!isSelected) {
-      setIngredientQuantities(prev => {
-        const newState = {...prev};
-        delete newState[ingredientId.toString()];
-        return newState;
-      });
-    }
-  };
+};
 
-  const handleIngredientChange = (ingredientId: number, quantity: string) => {
-    setIngredientQuantities(prev => ({
-      ...prev,
-      [ingredientId.toString()]: quantity
-    }));
-  };
-  // overflow-auto
-    return (<div className="flex flex-col max-h-96 flex-wrap columns-2"> 
-        {listOfIngredients.data?.map((ingredient) => (
-        <div key={ingredient.id} className="items-center gap-2 flex-col flex min-w-fit flex-nowrap">
-          <div className="flex flex-row">
+    return (<div className="flex flex-col max-h-96 flex-wrap columns-2 "> 
+        {data?.map((ingredient) => (
+        <div key={ingredient.id} className="items-start gap-2 flex-col flex min-w-fit flex-nowrap">
+          <div className="flex flex-row" >
           <input
             type="checkbox"
-            checked={selectedIngredients.has(ingredient.id)}
-            onChange={(e) => handleIngredientSelection(ingredient.id, e.target.checked)}
+            name="ingredientId"
+            data-ingredientid={ingredient.id}
+            checked={listOfIngredientsOnProduct?.map((ingredient)=>ingredient.ingredientId).includes(ingredient.id)??false}
+            onChange={handleIngredientsInProduct}
             
           />
           <label>{ingredient.name}</label>
           </div>
-          {selectedIngredients.has(ingredient.id) && (
+          {listOfIngredientsOnProduct?.map((productIngredient)=>productIngredient.ingredientId).includes(ingredient.id) && (
+
             <input
               type="number"
+              name="ingredientQuantity"
+              data-ingredientid={ingredient.id}
               placeholder="Quantity"
-              value={ingredientQuantities[ingredient.id.toString()] ?? ""}
-              onChange={(e) => handleIngredientChange(ingredient.id, e.target.value)}
-              className="rounded-full px-2 py-1 text-black"
+              value={listOfIngredientsOnProduct?.find(productIngredient => productIngredient.ingredientId === ingredient.id)?.quantity.toString() ?? ""}
+              onChange={handleIngredientsInProduct}
+              className="flex max-w-[80%] rounded-md px-2 py-1  text-black"
             />
           )}
         </div>

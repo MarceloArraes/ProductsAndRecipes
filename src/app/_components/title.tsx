@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { SigninComponent } from "./Signin-component"
 
 const Title = () => {
@@ -6,7 +7,7 @@ const Title = () => {
     <div className="container flex flex-row items-center  px-4 py-4 ">
       <SigninComponent />
     <h1 className="flex-1 text-5xl font-extrabold tracking-tight sm:text-[5rem] text-white">
-      Bom <span className="text-[hsl(226,100%,70%)]">de Bico</span> 
+      <Link href={'/'} >Bom <span className="text-[hsl(226,100%,70%)]">de Bico</span> </Link>
     </h1>
     
     </div>)

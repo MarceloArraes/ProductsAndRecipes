@@ -32,8 +32,8 @@ const ProductTable = () => {
             return (
                 <tr key={product.id} className="border-b">
                     <td className="px-4 border"><Link href={`/racoes/${product.id}`}>{product.name}</Link></td>
-                    <td className="px-4 border">${product.costPerKg}</td>
-                    <td className="px-4 border">${product.sellPricePerKg}</td>
+                    <td className="px-4 border">${product.costPerKg?.toFixed(2)}</td>
+                    <td className="px-4 border">${product.sellPricePerKg?.toFixed(2)}</td>
                     <td className="px-4 border">
                         <button 
                             className="text-white bg-red-500 hover:bg-red-700 font-bold py-1 px-3 rounded"

@@ -1,6 +1,5 @@
 import { getServerAuthSession } from "~/server/auth";
 import { CreateProduct } from "../_components/create-product";
-import ProductTable from "../_components/produt-table";
 
 const Ingredients = async() => {
     const session = await getServerAuthSession();
@@ -13,7 +12,7 @@ const Ingredients = async() => {
 
             </div>
             <div className="max-w-lg">
-            <ProductTable />
+            {/* <ProductTable /> */}
             
 
             </div>
