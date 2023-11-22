@@ -2,11 +2,11 @@
 
 import type { Ingredient } from "@prisma/client";
 // import {  useEffect, useState } from "react";
-import type { ChangeEvent} from "react";
+import { useEffect, type ChangeEvent, useState} from "react";
 import { api } from "~/trpc/react";
 
 const IngredientTable = () => {
-    // const [localIngredients, setLocalIngredients] = useState<Ingredient[]>([])
+    const [localIngredients, setLocalIngredients] = useState<Ingredient[]>([])
 
     const {data, refetch} =  api.ingredient.getAllIngredients.useQuery();
     const mutationDeleteIngredient = api.ingredient.deleteIngredient.useMutation({
@@ -21,34 +21,45 @@ const IngredientTable = () => {
           }
     })
 
-    // useEffect(() => {
-    //   if(data){
-    //     setLocalIngredients(data)
-    //   }
+    useEffect(() => {
+      if(data){
+        setLocalIngredients(data)
+      }
     
-    // }, [data, setLocalIngredients])
+    }, [data, setLocalIngredients])
 
 
     
     const handleChangeCost = (e: ChangeEvent<HTMLInputElement>) => {
         const value = Number(e.target.value);
         const ingredientId = Number(e.target.dataset.ingredientid)
-        // setLocalIngredients((prev: Ingredient[]) => {
-        //     const newArray: Ingredient[] = [...prev];
-        //     const elementIndex = newArray.findIndex(ingredient => ingredient.id == ingredientId);
+        setLocalIngredients((prev: Ingredient[]) => {
+            const newArray: Ingredient[] = [...prev];
+            const elementIndex = newArray.findIndex(ingredient => ingredient.id == ingredientId);
           
-        //     if (elementIndex !== -1) {
-        //       newArray[elementIndex] = {
-        //         ...newArray[elementIndex],
-        //         costPerKg: value
-        //       } as Ingredient;
-        //     }
+            if (elementIndex !== -1) {
+              newArray[elementIndex] = {id:ingredientId,
+                 costPerKg: value, 
+                 name: data?.find(ingredient => ingredient.id == ingredientId)?.name} as Ingredient;
+            }
           
-        //     return newArray;
-        //   });
+            return newArray;
+          });
           mutationUpdateIngredient.mutate({id:ingredientId, costPerKg: value, name: data?.find(ingredient => ingredient.id == ingredientId)?.name})
     }
     const deleteRow =  (id: number) => {
+        // array.splice(index, 1); 
+        setLocalIngredients((prev: Ingredient[]) => {
+            const newArray: Ingredient[] = [...prev];
+            const elementIndex = newArray.findIndex(ingredient => ingredient.id == id);
+          
+            if (elementIndex !== -1) {
+              newArray.splice(elementIndex, 1); 
+            }
+          
+            return newArray;
+          });
+
         mutationDeleteIngredient.mutate({id:id})
     } 
     
@@ -62,7 +73,7 @@ const IngredientTable = () => {
         </tr>
     </thead>
     <tbody>
-        {data?.map((ingredient: Ingredient) => {
+        {localIngredients?.map((ingredient: Ingredient) => {
             return (
                 <tr key={ingredient.id} className="border-b">
                     <td className="px-4 border">{ingredient.name}</td>
