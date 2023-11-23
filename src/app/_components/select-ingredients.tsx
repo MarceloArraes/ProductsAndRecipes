@@ -51,33 +51,46 @@ export const SelectIngredients = ({listOfIngredientsOnProduct, setLocalProduct}:
     });
 };
 
-    return (<div className="flex flex-col max-h-96 flex-wrap columns-2 "> 
-        {data?.map((ingredient) => (
-        <div key={ingredient.id} className="items-start gap-2 flex-col flex min-w-fit flex-nowrap">
-          <div className="flex flex-row" >
-          <input
-            type="checkbox"
-            name="ingredientId"
-            data-ingredientid={ingredient.id}
-            checked={listOfIngredientsOnProduct?.map((ingredient)=>ingredient.ingredientId).includes(ingredient.id)??false}
-            onChange={handleIngredientsInProduct}
-            
-          />
-          <label>{ingredient.name}</label>
-          </div>
-          {listOfIngredientsOnProduct?.map((productIngredient)=>productIngredient.ingredientId).includes(ingredient.id) && (
+const selectedIngredients = data?.filter(ingredient =>
+  listOfIngredientsOnProduct?.some(productIngredient => productIngredient.ingredientId === ingredient.id)
+) ?? [];
 
-            <input
-              type="number"
-              name="ingredientQuantity"
-              data-ingredientid={ingredient.id}
-              placeholder="Quantity"
-              value={listOfIngredientsOnProduct?.find(productIngredient => productIngredient.ingredientId === ingredient.id)?.quantity.toString() ?? ""}
-              onChange={handleIngredientsInProduct}
-              className="flex max-w-[80%] rounded-md px-2 py-1  text-black"
-            />
-          )}
-        </div>
-      ))}
+const unselectedIngredients = data?.filter(ingredient =>
+  !listOfIngredientsOnProduct?.some(productIngredient => productIngredient.ingredientId === ingredient.id)
+) ?? [];
+
+const sortedIngredients = [...selectedIngredients, ...unselectedIngredients];
+
+    return (
+    <div className="flex flex-col max-h-96 flex-wrap columns-2 "> 
+        {sortedIngredients?.map((ingredient) => {
+          const isSelected = listOfIngredientsOnProduct?.map((ingredient)=>ingredient.ingredientId).includes(ingredient.id);
+          return (
+              <div key={ingredient.id} className="items-start gap-2 flex-col flex min-w-fit flex-nowrap">
+                <div className="flex flex-row" >
+                <input
+                  type="checkbox"
+                  name="ingredientId"
+                  data-ingredientid={ingredient.id}
+                  checked={isSelected??false}
+                  onChange={handleIngredientsInProduct}
+                  
+                />
+                <label>{ingredient.name}</label>
+                </div>
+                {isSelected && (
+
+                  <input
+                    type="number"
+                    name="ingredientQuantity"
+                    data-ingredientid={ingredient.id}
+                    placeholder="Quantity"
+                    value={listOfIngredientsOnProduct?.find(productIngredient => productIngredient.ingredientId === ingredient.id)?.quantity.toString() ?? ""}
+                    onChange={handleIngredientsInProduct}
+                    className="flex max-w-[80%] rounded-md px-2 py-1 text-black"
+                  />
+                )}
+              </div>
+      )})}
     </div>)
 }

@@ -14,3 +14,5 @@
 - Button to archive the product
 - Page for admin where we can delete any content.
 - Put suspense on or around the components.
+- Use the select-ingredients inside the create product
+- sort the select ingredients for them to show organized first when selected
