@@ -1,13 +1,18 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { api } from "~/trpc/react";
 import { SelectIngredients } from "./select-ingredients";
-import { Product, ProductIngredient } from "@prisma/client";
 
-type IngredientQuantities = Record<string, string>;
 
-interface ExtendedProduct extends Product {
+interface ProductIngredient {
+  productId?: number; // productId is now optional
+  ingredientId: number;
+  quantity: number;
+}
+
+interface ExtendedProduct {
+  id?: number;
   ingredients: ProductIngredient[];
 }
 
@@ -15,7 +20,7 @@ export function CreateProduct() {
   // const router = useRouter();
   const [name, setName] = useState("");
   const [sellPrice, setSellPrice] = useState("");
-  const [selectedIngredients, setSelectedIngredients] = useState<ExtendedProduct | null>()
+  const [selectedIngredients, setSelectedIngredients] = useState<ExtendedProduct | undefined| null>()
 
   // const listOfIngredients = api.ingredient.getAllIngredients.useQuery();
 
@@ -29,6 +34,9 @@ export function CreateProduct() {
   });
 
   const prepareIngredientsForSubmission = () => {
+    if (!selectedIngredients) {
+      return [];
+    }
     return selectedIngredients?.ingredients?.map((ingredient) => ({
       ingredientId: ingredient.ingredientId,
       quantity: ingredient.quantity

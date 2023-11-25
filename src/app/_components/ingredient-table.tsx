@@ -67,20 +67,18 @@ const IngredientTable = () => {
 <table className="max-w-lg table-auto border-collapse bg-white shadow-md text-black m-10" >
     <thead className="bg-gray-200">
         <tr >
-            <th className="px-4 border">Ingrediente</th>
-            <th className="px-4 border">Valor por Kg</th>
-            <th className="px-4 border">Delete</th>
+            <th className="px-2 border">Ingrediente</th>
+            <th className="px-2 border">Valor por Kg</th>
+            <th className="px-2 border">Delete</th>
         </tr>
     </thead>
     <tbody>
         {localIngredients?.map((ingredient: Ingredient) => {
             return (
-                <tr key={ingredient.id} className="border-b">
-                    <td className="px-4 border">{ingredient.name}</td>
-                    <td className="px-4 border">${ingredient.costPerKg}
-                    <input name="costPerKg" data-ingredientid={ingredient.id} type="number" value={ingredient.costPerKg ?? 0} onChange={handleChangeCost} />
-                    </td>
-                    <td className="px-4 border">
+                <tr key={ingredient.id} className="border-b justify-center items-center">
+                    <td className="px-2 border whitespace-nowrap">{ingredient.name}</td>
+                    <td className="px-2"><div className="flex-row flex">$<input name="costPerKg" data-ingredientid={ingredient.id} type="number" value={ingredient.costPerKg ?? 0} onChange={handleChangeCost} /></div></td>
+                    <td className="px-2 border">
                         <button 
                             className="text-white bg-red-500 hover:bg-red-700 font-bold py-1 px-3 rounded"
                             onClick={() => deleteRow(ingredient.id)}

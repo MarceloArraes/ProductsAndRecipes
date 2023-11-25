@@ -1,16 +1,22 @@
 "use client"
 
-import type { Product, ProductIngredient } from "@prisma/client";
 import type {ChangeEvent, Dispatch, SetStateAction} from "react";
 import { api } from "~/trpc/react";
 
 
 interface SelectIngredientsProps2 {
   listOfIngredientsOnProduct: ProductIngredient[] | undefined;
-  setLocalProductIngredient: Dispatch<SetStateAction<ExtendedProduct | undefined>>;
+  setLocalProductIngredient: Dispatch<SetStateAction<ExtendedProduct | null | undefined>>;
 }
 
-interface ExtendedProduct extends Product {
+interface ProductIngredient {
+  productId?: number; // productId is now optional
+  ingredientId: number;
+  quantity: number;
+}
+
+interface ExtendedProduct {
+  id?: number;
   ingredients: ProductIngredient[];
 }
 
@@ -28,16 +34,15 @@ export const SelectIngredients = ({listOfIngredientsOnProduct, setLocalProductIn
         if (!prevState) {
           if (isCheckbox) {
                 return {
-                  ingredients: [{ ingredientId, quantity: 0 }]
+                  ingredients: [{ ingredientId, quantity: 0}]
               };
           }
-          return;
+          return null;
         }
 
         // Handle checkbox change
         if (isCheckbox) {
           const ingredientExists = prevState?.ingredients?.some(ingredient => ingredient.ingredientId === ingredientId);
-
 
             return {
                 ...prevState,
