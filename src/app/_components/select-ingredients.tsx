@@ -7,14 +7,14 @@ import { api } from "~/trpc/react";
 
 interface SelectIngredientsProps2 {
   listOfIngredientsOnProduct: ProductIngredient[] | undefined;
-  setLocalProduct: Dispatch<SetStateAction<ExtendedProduct | undefined>>;
+  setLocalProductIngredient: Dispatch<SetStateAction<ExtendedProduct | undefined>>;
 }
 
 interface ExtendedProduct extends Product {
   ingredients: ProductIngredient[];
 }
 
-export const SelectIngredients = ({listOfIngredientsOnProduct, setLocalProduct}:SelectIngredientsProps2) => {
+export const SelectIngredients = ({listOfIngredientsOnProduct, setLocalProductIngredient}:SelectIngredientsProps2) => {
   const {data} = api.ingredient.getAllIngredients.useQuery();
   
   const handleIngredientsInProduct = (e: ChangeEvent<HTMLInputElement>) => {
@@ -22,21 +22,28 @@ export const SelectIngredients = ({listOfIngredientsOnProduct, setLocalProduct}:
     if (isNaN(ingredientId)) return;
     const isCheckbox = e.target.type === 'checkbox';
 
-    setLocalProduct(prevState => {
+    setLocalProductIngredient(prevState => {
         // If prevState is null, return null
         console.log('prevState ', prevState);
-        if (!prevState) return undefined;
+        if (!prevState) {
+          if (isCheckbox) {
+                return {
+                  ingredients: [{ ingredientId, quantity: 0 }]
+              };
+          }
+          return;
+        }
 
         // Handle checkbox change
         if (isCheckbox) {
-          const ingredientExists = prevState.ingredients.some(ingredient => ingredient.ingredientId === ingredientId);
+          const ingredientExists = prevState?.ingredients?.some(ingredient => ingredient.ingredientId === ingredientId);
 
 
             return {
                 ...prevState,
                 ingredients: ingredientExists
-                    ? prevState.ingredients.filter(ingredient => ingredient.ingredientId !== ingredientId)
-                    : [...prevState.ingredients, { ingredientId, quantity: 0, productId: prevState.id }]
+                    ? prevState?.ingredients?.filter(ingredient => ingredient.ingredientId !== ingredientId)
+                    : [...prevState?.ingredients, { ingredientId, quantity: 0, productId: prevState?.id }]
             };
         }
 
@@ -44,7 +51,7 @@ export const SelectIngredients = ({listOfIngredientsOnProduct, setLocalProduct}:
         const quantity = parseInt(e.target.value, 10) || 0;
         return {
             ...prevState,
-            ingredients: prevState.ingredients.map(ingredient =>
+            ingredients: prevState?.ingredients?.map(ingredient =>
                 ingredient.ingredientId === ingredientId ? { ...ingredient, quantity } : ingredient
             )
         };
