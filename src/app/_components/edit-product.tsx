@@ -11,9 +11,13 @@ import type { ExtendedProduct } from "./select-ingredients";
 export function EditProduct({productId}:{productId: string}) {
   const [localProduct, setLocalProduct] = useState<ExtendedProduct | undefined| null>();
     const numberId = parseInt(productId);
-    const {data, isLoading} = api.product.getProductById.useQuery({id:numberId})
+    const {data, isLoading, refetch} = api.product.getProductById.useQuery({id:numberId})
 
-    const productMutation = api.product.updateProduct.useMutation()
+    const productMutation = api.product.updateProduct.useMutation({
+      onSuccess: async () => {
+        await refetch();
+      }
+    })
 
     useEffect(() => {
       if (data !== null) {
@@ -56,7 +60,7 @@ export function EditProduct({productId}:{productId: string}) {
               value={localProduct?.name ??''}
               name="name"
               onChange={handleLocalProductChange}
-              className="w-full rounded-full px-4 py-2 text-black"
+              className="w-full rounded-full px-4 py-2 text-black mt-1"
           />
           <input
               type="text"
@@ -64,9 +68,12 @@ export function EditProduct({productId}:{productId: string}) {
               placeholder={localProduct?.sellPricePerKg?.toString()}
               value={localProduct?.sellPricePerKg??''}
               onChange={handleLocalProductChange}
-              className="w-full rounded-full px-4 py-2 text-black"
+              className="w-full rounded-full px-4 py-2 text-black mt-1"
           />
         
+      </div>
+      <div className="bg-gray-300 rounded-full w-fit whitespace-nowrap text-black px-2 py-1 justify-center items-center m-1">
+        Cost per Kg: ${localProduct?.costPerKg?.toFixed(2)}
       </div>
           <SelectIngredients 
             listOfIngredientsOnProduct={localProduct?.ingredients}

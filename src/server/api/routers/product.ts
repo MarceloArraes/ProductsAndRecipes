@@ -29,6 +29,9 @@ export const productRouter = createTRPCRouter({
   .input(z.object({ 
     name: z.string().min(1),
     sellPricePerKg: z.number(),
+    isArchive: z.boolean().optional(),
+    batchSize: z.number().optional(),
+    costPerKg: z.number().optional(),
     ingredients: z.array(z.object({
       ingredientId: z.number(),
       quantity: z.number()
@@ -51,14 +54,16 @@ export const productRouter = createTRPCRouter({
     const totalIngredientCost = ingredientCosts.reduce((total, cost) => total + cost, 0);
 
     // Calculate cost per kg
-    const costPerKg = totalIngredientCost / ingredientsWeight as unknown as number;
+    const calculatedCostPerKg = totalIngredientCost / ingredientsWeight as unknown as number;
 
 
     return ctx.db.product.create({
       data: {
         name: input.name,
         sellPricePerKg: input.sellPricePerKg,
-        costPerKg: costPerKg,
+        costPerKg: calculatedCostPerKg,
+        batchSize: ingredientsWeight,
+        isArchived: input.isArchive,
         ingredients: {
           create: input.ingredients.map(ing => ({
             quantity: ing.quantity,
@@ -78,16 +83,20 @@ updateProduct: protectedProcedure
     id: z.number(),
     name: z.string().min(1).optional(),
     sellPricePerKg: z.number().optional(),
+    isArchive: z.boolean().optional(),
+    batchSize: z.number().optional(),
+    costPerKg: z.number().optional(),
     ingredients: z.array(z.object({
       ingredientId: z.number(),
       quantity: z.number()
     })).optional(),
   }))
   .mutation(async ({ ctx, input }) => {
-    let costPerKg =0;
+    let calculatedCostPerKg =0;
+    let ingredientsWeight = 0;
 
     if (input.ingredients) {
-      const ingredientsWeight = input.ingredients.reduce((total, ingredient) => total + ingredient.quantity, 0);
+      ingredientsWeight = input.ingredients.reduce((total, ingredient) => total + ingredient.quantity, 0);
 
       const ingredientCosts = await Promise.all(input.ingredients.map(async (ingredient) => {
         const ingredientData = await api.ingredient.getIngredientById.query({ id: ingredient.ingredientId });
@@ -103,7 +112,7 @@ updateProduct: protectedProcedure
       const totalIngredientCost = ingredientCosts.reduce((total, cost) => total + cost, 0);
 
       // Calculate cost per kg
-      costPerKg = totalIngredientCost / ingredientsWeight;
+      calculatedCostPerKg = totalIngredientCost / ingredientsWeight;
     }
 
     await ctx.db.productIngredient.deleteMany({
@@ -117,7 +126,9 @@ updateProduct: protectedProcedure
       data: {
         name: input.name,
         sellPricePerKg: input.sellPricePerKg,
-        costPerKg: costPerKg,
+        costPerKg: calculatedCostPerKg,
+        batchSize: ingredientsWeight,
+        isArchived: input.isArchive,
         ...(input.ingredients && {
           
           ingredients: {

@@ -49,7 +49,7 @@ export function CreateProduct() {
         e.preventDefault();
         const preparedIngredients = prepareIngredientsForSubmission();
         console.log('selectedIngredients ',selectedIngredients);
-        console.log('preparedIngredients ',preparedIngredients);
+        console.log('createProduct.mutate ',{ name, sellPricePerKg: parseFloat(sellPrice), ingredients: preparedIngredients });
         createProduct.mutate({ name, sellPricePerKg: parseFloat(sellPrice), ingredients: preparedIngredients });
       }}
       className="flex flex-col justify-center items-center gap-2"
