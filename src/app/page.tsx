@@ -1,6 +1,6 @@
 import Link from "next/link";
-import IngredientTable from "./_components/ingredient-table";
-import ProductTable from "./_components/produt-table";
+import {IngredientTable} from "./_components/ingredient-table";
+import {ProductTable} from "./_components/produt-table";
 // import { useRouter } from "next/router";
 
 // Replace CreatePost with CreateIngredient

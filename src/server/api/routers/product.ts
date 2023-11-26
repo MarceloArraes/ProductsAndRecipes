@@ -14,7 +14,7 @@ export const productRouter = createTRPCRouter({
         include: { ingredients: true },
       });
     }),
-  getAllProducts: publicProcedure
+  getAllProducts: protectedProcedure
     .query(async ({ ctx }) => {
       return ctx.db.product.findMany({
         orderBy:{

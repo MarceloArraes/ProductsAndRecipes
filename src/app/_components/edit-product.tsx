@@ -1,10 +1,8 @@
 "use client";
 
 import type { Product } from "@prisma/client";
-// import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
-// import {trpc} from '../api/trpc/[trpc]'
 import { api } from "~/trpc/react";
 import { SelectIngredients } from "./select-ingredients";
 import type { ExtendedProduct } from "./select-ingredients";

@@ -1,6 +1,6 @@
 import { getServerAuthSession } from "~/server/auth";
 import { CreateIngredient } from "../_components/create-ingredient";
-import IngredientTable from "../_components/ingredient-table";
+import {IngredientTable} from "../_components/ingredient-table";
 
 const Ingredients = async() => {
     const session = await getServerAuthSession();

@@ -4,7 +4,7 @@ import type { Product } from "@prisma/client";
 import Link from "next/link";
 import { api } from "~/trpc/react";
 
-const ProductTable = () => {
+export const ProductTable = () => {
 
     const {data, refetch} =  api.product.getAllProducts.useQuery();
     const mutationDeleteProduct = api.product.deleteProduct.useMutation({
@@ -48,4 +48,3 @@ const ProductTable = () => {
     </tbody>
 </table>
 )}
-export default ProductTable

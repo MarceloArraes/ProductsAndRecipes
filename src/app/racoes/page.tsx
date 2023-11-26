@@ -1,13 +1,13 @@
 import { getServerAuthSession } from "~/server/auth";
 import { CreateProduct } from "../_components/create-product";
 
-const Ingredients = async() => {
+const Racoes = async() => {
     const session = await getServerAuthSession();
 
   if (!session?.user) return null;
     return (
-        <main className="flex min-h-screen flex-col bg-gradient-to-b items-center justify-start from-[#2e026d] to-[#15162c] text-white">
-            <div className="max-w-sm">
+        <main className="flex flex-1 min-h-screen flex-col items-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
+            <div className="justify-center flex  ">
             <CreateProduct />
 
             </div>
@@ -20,5 +20,6 @@ const Ingredients = async() => {
         </main>
       );
 }
-export default Ingredients
+export default Racoes
 
+//outline-2 outline-red-500 outline-double

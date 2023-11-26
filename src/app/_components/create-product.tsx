@@ -52,7 +52,7 @@ export function CreateProduct() {
         console.log('preparedIngredients ',preparedIngredients);
         createProduct.mutate({ name, sellPricePerKg: parseFloat(sellPrice), ingredients: preparedIngredients });
       }}
-      className="flex flex-col gap-2"
+      className="flex flex-col justify-center items-center gap-2"
     >
       <input
         type="text"

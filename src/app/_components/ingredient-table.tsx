@@ -1,11 +1,10 @@
 "use client";
 
 import type { Ingredient } from "@prisma/client";
-// import {  useEffect, useState } from "react";
 import { useEffect, type ChangeEvent, useState} from "react";
 import { api } from "~/trpc/react";
 
-const IngredientTable = () => {
+export const IngredientTable = () => {
     const [localIngredients, setLocalIngredients] = useState<Ingredient[]>([])
 
     const {data, refetch} =  api.ingredient.getAllIngredients.useQuery();
@@ -92,4 +91,3 @@ const IngredientTable = () => {
     </tbody>
 </table>
 )}
-export default IngredientTable
