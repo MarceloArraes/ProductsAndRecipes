@@ -1,19 +1,17 @@
 "use client";
 
-import type { Product, ProductIngredient } from "@prisma/client";
+import type { Product } from "@prisma/client";
 // import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
 // import {trpc} from '../api/trpc/[trpc]'
 import { api } from "~/trpc/react";
 import { SelectIngredients } from "./select-ingredients";
+import type { ExtendedProduct } from "./select-ingredients";
 
-interface ExtendedProduct extends Product {
-  ingredients: ProductIngredient[];
-}
 
 export function EditProduct({productId}:{productId: string}) {
-  const [localProduct, setLocalProduct] = useState<ExtendedProduct | undefined>();
+  const [localProduct, setLocalProduct] = useState<ExtendedProduct | undefined| null>();
     const numberId = parseInt(productId);
     const {data, isLoading} = api.product.getProductById.useQuery({id:numberId})
 
@@ -47,7 +45,7 @@ export function EditProduct({productId}:{productId: string}) {
       onSubmit={(e) => {
         e.preventDefault();
         console.log('localProduct ', localProduct);
-        if(localProduct) productMutation.mutate(localProduct);
+        if(localProduct) productMutation.mutate(localProduct as Product);
       }}
       className="flex flex-col gap-2 w-full"
     >
@@ -74,7 +72,8 @@ export function EditProduct({productId}:{productId: string}) {
       </div>
           <SelectIngredients 
             listOfIngredientsOnProduct={localProduct?.ingredients}
-            setLocalProduct={setLocalProduct}
+            setLocalProductIngredient={setLocalProduct}
+
         />
         <button
           type="submit"

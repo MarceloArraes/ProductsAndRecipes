@@ -15,12 +15,18 @@ interface ProductIngredient {
   quantity: number;
 }
 
-interface ExtendedProduct {
+
+export interface ExtendedProduct {
   id?: number;
+  name?: string;
+  sellPricePerKg?: number;
+  costPerKg?: number;
+  batchSize?: number;
+  isArchived?: boolean;
   ingredients: ProductIngredient[];
 }
 
-export const SelectIngredients = ({listOfIngredientsOnProduct, setLocalProductIngredient}:SelectIngredientsProps2) => {
+export const SelectIngredients: React.FC<SelectIngredientsProps2> = ({listOfIngredientsOnProduct, setLocalProductIngredient}) => {
   const {data} = api.ingredient.getAllIngredients.useQuery();
   
   const handleIngredientsInProduct = (e: ChangeEvent<HTMLInputElement>) => {
