@@ -63,7 +63,7 @@ export const IngredientTable = () => {
     } 
     
     return (
-<table className="max-w-lg table-auto border-collapse bg-white shadow-md text-black m-10" >
+<table className="bg-white shadow-md text-black m-1 sm:m-10" >
     <thead className="bg-gray-200">
         <tr >
             <th className="px-2 border">Ingrediente</th>
@@ -75,9 +75,12 @@ export const IngredientTable = () => {
         {localIngredients?.map((ingredient: Ingredient) => {
             return (
                 <tr key={ingredient.id} className="border-b justify-center items-center">
-                    <td className="px-2 border whitespace-nowrap">{ingredient.name}</td>
-                    <td className="px-2"><div className="flex-row flex">$<input name="costPerKg" data-ingredientid={ingredient.id} type="number" value={ingredient.costPerKg ?? 0} onChange={handleChangeCost} /></div></td>
-                    <td className="px-2 border">
+                    <td className="px-2 border sm:whitespace-nowrap">{ingredient.name}</td>
+                    <td className="px-2 w-20">
+                        <div className="flex-row flex flex-1">$<input className="w-full" name="costPerKg" data-ingredientid={ingredient.id} type="number" value={ingredient.costPerKg ?? 0} onChange={handleChangeCost} />
+                        </div>
+                    </td>
+                    <td className="px-2 border items-center justify-center">
                         <button 
                             className="text-white bg-red-500 hover:bg-red-700 font-bold py-1 px-3 rounded"
                             onClick={() => deleteRow(ingredient.id)}

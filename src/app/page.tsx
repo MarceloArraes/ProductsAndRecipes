@@ -11,7 +11,7 @@ export default function Home() {
   // const helloIngredient = await api.ingredient.hello.query({ text: "from tRPC" });
 
   return (
-    <main className="flex min-h-screen items-center flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
+    <main className="flex items-center flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
       <Link
         href={'/ingredients'}
         className="rounded-full max-w-xs bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20 mt-2"
@@ -24,7 +24,7 @@ export default function Home() {
       >
         Criar Racoes
       </Link>
-      <div className="flex flex-row min-w-fit justify-around mx-5">
+      <div className="flex flex-row flex-wrap justify-around mx-5">
         <ProductTable />
         <IngredientTable />
       </div>

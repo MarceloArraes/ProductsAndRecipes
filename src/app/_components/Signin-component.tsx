@@ -7,7 +7,6 @@ import { getServerAuthSession } from "~/server/auth";
 export const SigninComponent = async () => {
     const session = await getServerAuthSession();
 
-    console.log('Session ', session);
     return(
         <div className=" flex flex-col items-start justify-start gap-4 m-10">
         <p className="text-center text-base text-white">

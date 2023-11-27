@@ -80,7 +80,7 @@ const unselectedIngredients = data?.filter(ingredient =>
 const sortedIngredients = [...selectedIngredients, ...unselectedIngredients];
 
     return (
-    <div className="flex flex-col max-h-96 flex-wrap columns-2 "> 
+    <div className="flex flex-col sm:max-h-[48rem] lg:max-h-96 flex-wrap columns-2 "> 
         {sortedIngredients?.map((ingredient) => {
           const isSelected = listOfIngredientsOnProduct?.map((ingredient)=>ingredient.ingredientId).includes(ingredient.id);
           return (
