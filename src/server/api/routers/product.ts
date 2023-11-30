@@ -114,13 +114,52 @@ updateProduct: protectedProcedure
       // Calculate cost per kg
       calculatedCostPerKg = totalIngredientCost / ingredientsWeight;
     }
-
-    await ctx.db.productIngredient.deleteMany({
-      where: {
-        productId: input.id
-      }
+    const currentIngredients = await ctx.db.productIngredient.findMany({
+      where: { productId: input.id }
     });
 
+    // Determine changes in ingredients
+    const newIngredients = input.ingredients ?? [];
+    const ingredientsToAdd = newIngredients.filter(ing => !currentIngredients.some(curr => curr.ingredientId === ing.ingredientId));
+    const ingredientsToUpdate = currentIngredients.filter(curr => newIngredients.some(ing => ing.ingredientId === curr.ingredientId));
+    const ingredientsToRemove = currentIngredients.filter(curr => !newIngredients.some(ing => ing.ingredientId === curr.ingredientId));
+
+    for (const ingredient of ingredientsToAdd) {
+      await ctx.db.productIngredient.create({
+        data: {
+          productId: input.id,
+          ingredientId: ingredient.ingredientId,
+          quantity: ingredient.quantity
+        }
+      });
+    }
+
+    for (const ingredient of ingredientsToUpdate) {
+      await ctx.db.productIngredient.update({
+        where: {
+          productId_ingredientId: {
+            productId: input.id,
+            ingredientId: ingredient.ingredientId
+          }
+        },
+        data: {
+          quantity: newIngredients?.find(ing => ing.ingredientId === ingredient.ingredientId)?.quantity ?? 0
+        }
+      });
+    }
+
+    for (const ingredient of ingredientsToRemove) {
+      await ctx.db.productIngredient.delete({
+        where: {
+          productId_ingredientId: {
+            productId: input.id,
+            ingredientId: ingredient.ingredientId
+          }
+        }
+      });
+    }
+
+    // Update the product with the new calculated fields
     return ctx.db.product.update({
       where: { id: input.id },
       data: {
@@ -128,18 +167,8 @@ updateProduct: protectedProcedure
         sellPricePerKg: input.sellPricePerKg,
         costPerKg: calculatedCostPerKg,
         batchSize: ingredientsWeight,
-        isArchived: input.isArchive,
-        ...(input.ingredients && {
-          
-          ingredients: {
-            create: input.ingredients.map(ing => ({
-              quantity: ing.quantity,
-              ingredient: {
-                connect: { id: ing.ingredientId },
-              },
-            })),
-          },
-        }),
+        isArchived: input.isArchive
+        // Note: No need to handle ingredients here since they are updated above
       },
     });
   }),
