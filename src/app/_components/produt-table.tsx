@@ -18,7 +18,10 @@ export const ProductTable = () => {
     } 
 
     return (
+        <>
+        {/* <App/> */}
     <table className="bg-white shadow-md text-black m-10 h-fit">
+        
         <thead className="bg-gray-200">
             <tr>
                 <th className="px-2 border w-48">Produto</th>
@@ -47,4 +50,13 @@ export const ProductTable = () => {
         })}
     </tbody>
 </table>
+</>
+
 )}
+
+
+// const App = () => (
+//     <PDFViewer>
+//       <MyDocument />
+//     </PDFViewer>
+//   );

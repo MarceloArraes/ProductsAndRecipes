@@ -29,15 +29,26 @@ export function EditProduct({productId}:{productId: string}) {
     const handleLocalProductChange = ((e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       const inputName = e.target.name
+      const inputType = e.target.type;
+
+      let processedValue = value as number|string;
+      if(inputType=='number'){
+        processedValue = Number(value);
+      }
+
+
       setLocalProduct(prevState => {
         if (!prevState) return prevState;
           return {
               ...prevState,
-              [e.target.name]: inputName==='sellPricePerKg'? parseInt(value) : value
+              [inputName]:  processedValue
           };
       });
   })
 
+  const totalIngredientWeight = localProduct?.ingredients?.reduce((total, productIngredient) => {
+    return total + productIngredient.quantity;
+  }, 0);
 
 
 
@@ -63,10 +74,19 @@ export function EditProduct({productId}:{productId: string}) {
               className="w-full rounded-full px-4 py-2 text-black mt-1"
           />
           <input
-              type="text"
+              type="number"
               name="sellPricePerKg"
-              placeholder={localProduct?.sellPricePerKg?.toString()}
-              value={localProduct?.sellPricePerKg??''}
+              placeholder='Preco de venda'
+              step={0.1}
+              value={localProduct?.sellPricePerKg??0}
+              onChange={handleLocalProductChange}
+              className="w-full rounded-full px-4 py-2 text-black mt-1"
+          />
+          <input
+              type="number"
+              name="batchSize"
+              placeholder='Peso ideal da batida'
+              value={localProduct?.batchSize??0}
               onChange={handleLocalProductChange}
               className="w-full rounded-full px-4 py-2 text-black mt-1"
           />
@@ -74,6 +94,12 @@ export function EditProduct({productId}:{productId: string}) {
       </div>
       <div className="bg-gray-300 rounded-full w-fit whitespace-nowrap text-black px-2 py-1 justify-center items-center m-1">
         Cost per Kg: ${localProduct?.costPerKg?.toFixed(2)}
+      </div>
+      <div className="bg-gray-300 rounded-full w-fit whitespace-nowrap text-black px-2 py-1 justify-center items-center m-1">
+        Peso ideal da batida: {localProduct?.batchSize}
+      </div>
+      <div className="bg-gray-300 rounded-full w-fit whitespace-nowrap text-black px-2 py-1 justify-center items-center m-1">
+        Peso dos ingredientes: {totalIngredientWeight}
       </div>
           <SelectIngredients 
             listOfIngredientsOnProduct={localProduct?.ingredients}

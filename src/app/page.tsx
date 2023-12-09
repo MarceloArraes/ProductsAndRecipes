@@ -24,6 +24,12 @@ export default function Home() {
       >
         Criar Racoes
       </Link>
+      <Link
+        href={'/print-pdf'}
+        className="rounded-full max-w-xs bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20 mt-2"
+      >
+        Imprimir Formulacoes
+      </Link>
       <div className="flex flex-row flex-wrap justify-around mx-5">
         <ProductTable />
         <IngredientTable />

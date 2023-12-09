@@ -14,15 +14,20 @@ export const productRouter = createTRPCRouter({
         include: { ingredients: true },
       });
     }),
-  getAllProducts: protectedProcedure
+    
+    getAllProducts: protectedProcedure
     .query(async ({ ctx }) => {
       return ctx.db.product.findMany({
-        orderBy:{
-          name:'desc'
+        orderBy: { name: 'desc' },
+        include: {
+          ingredients: {
+            include: {
+              ingredient: true
+            }
+          }
         }
-      })
+      });
     }),
-
   // Create a new product
   // Here will evaluate if > 500kg and make the calculations to get the cost per kg
   createProduct: protectedProcedure
@@ -166,7 +171,7 @@ updateProduct: protectedProcedure
         name: input.name,
         sellPricePerKg: input.sellPricePerKg,
         costPerKg: calculatedCostPerKg,
-        batchSize: ingredientsWeight,
+        batchSize: input.batchSize,
         isArchived: input.isArchive
         // Note: No need to handle ingredients here since they are updated above
       },
