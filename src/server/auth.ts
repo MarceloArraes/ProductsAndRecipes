@@ -1,9 +1,13 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import {
+  type Account,
   getServerSession,
+  type Profile,
   type DefaultSession,
   type NextAuthOptions,
+  type User,
 } from "next-auth";
+import { type AdapterUser } from "next-auth/adapters";
 import DiscordProvider from "next-auth/providers/discord";
 
 import { env } from "~/env.mjs";
@@ -37,6 +41,24 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    signIn({
+      user,
+    }: {
+      user: User | AdapterUser;
+      account: Account | null;
+      profile?: Profile | undefined;
+    }) {
+      const allowedUsers = [
+        "marcelo.arraes@gmail.com",
+        "alvaro.rtl@hotmail.com",
+      ];
+
+      if (allowedUsers.includes(user?.email ?? "")) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     session: ({ session, user }) => ({
       ...session,
       user: {

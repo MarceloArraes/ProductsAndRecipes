@@ -1,7 +1,7 @@
 "use client";
-import { api } from '~/trpc/react';
-import { MyDocument } from './pdf-generator';
-import { PDFViewer } from '@react-pdf/renderer';
+import { api } from "~/trpc/react";
+import { MyDocument } from "./pdf-generator";
+import { PDFViewer } from "@react-pdf/renderer";
 
 const PdfOnScreen = () => {
   const { data: products, isLoading } = api.product.getAllProducts.useQuery();
@@ -10,12 +10,12 @@ const PdfOnScreen = () => {
     return <div>Loading...</div>;
   }
 
-  if (!products ) {
+  if (!products) {
     return <div>No products found</div>;
   }
 
   return (
-    <PDFViewer>
+    <PDFViewer height={600} width={550}>
       <MyDocument products={products} />
     </PDFViewer>
   );

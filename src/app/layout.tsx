@@ -24,7 +24,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable} bg-gradient-to-b from-[#2e026d] to-[#15162c]`}>
+      <body
+        className={`font-sans ${inter.variable} bg-gradient-to-b from-[#2e026d] to-[#15162c]`}
+      >
         <TRPCReactProvider cookies={cookies().toString()}>
           <Title />
 
