@@ -41,19 +41,22 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    signIn({
+    async signIn({
       user,
-    }: {
+    } // account,
+    // profile,
+    : {
       user: User | AdapterUser;
-      account: Account | null;
-      profile?: Profile | undefined;
+      // account: Account | null;
+      // profile?: Profile | undefined;
     }) {
-      const allowedUsers = [
-        "marcelo.arraes@gmail.com",
-        "alvaro.rtl@hotmail.com",
-      ];
-
-      if (allowedUsers.includes(user?.email ?? "")) {
+      // Check if the user exists in the database and has a verified email
+      const dbUser = await db.user.findUnique({
+        where: { id: user.id },
+        select: { emailVerified: true },
+      });
+      // console.log("account profile", account, profile, dbUser);
+      if (dbUser?.emailVerified) {
         return true;
       } else {
         return false;
